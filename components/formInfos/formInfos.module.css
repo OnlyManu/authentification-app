@@ -1,0 +1,135 @@
+.container {
+    display: flex;
+    flex-direction: column;
+    gap: 32px;
+    padding: 0px 18px;
+}
+
+.link {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    width: fit-content;
+    gap: 9px;
+    font-size: 18px;
+    font-weight: 400;
+    line-height: 24.52px;
+    color: var(--color-blue-2);
+    cursor: pointer;
+}
+.linkIcon {
+    width: 18px;
+    height: 18px;
+}
+.linkIcon path {
+    fill: var(--color-blue-2);
+}
+
+.formEditWrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 32px;
+}
+.formEdit {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 32px;
+}
+.profileGroup {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 20px;
+    margin-bottom: 32px;
+}
+.profile {
+    position: relative;
+    display: flex;
+    width: 72px;
+    height: 72px;
+    border-radius: 8px;
+    background-color: var(--color-gray-3);
+    overflow: hidden;
+}
+.profileOver {
+    position: absolute;
+    z-index: 2;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.2);
+}
+.profileIcon {
+    z-index: 3;
+}
+.profileIcon path, .profileIcon circle {
+    fill: var(--color-white);
+}
+.profileLabel {
+    font-size: 13px;
+    font-weight: 500;
+    line-height: 17.71px;
+    color: var(--color-gray);
+}
+
+.inputs {
+    display: flex;
+    flex-direction: column;
+    gap: 22px;
+    margin-bottom: 24px;
+}
+.iptGroup {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+.iptLabel {
+    font-size: 13px;
+    font-weight: 500;
+    line-height: 17.71px;
+    color: var(--color-gray-2);
+}
+.ipt, .textarea {
+    display: flex;
+    width: 100%;
+    border: 1px solid var(--color-gray-2);
+    border-radius: 12px;
+}
+.ipt::placeholder, .textarea::placeholder {
+    font-size: 13px;
+    font-weight: 500;
+    line-height: 17.71px;
+    color: var(--color-gray-5);
+}
+.ipt:focus-visible, .textarea:focus-visible {
+    outline: none;
+}
+.ipt:focus-within, .textarea:focus-within {
+    outline: none;
+}
+.ipt {
+    height: 48px;
+    padding: 0px 18px;
+}
+.textarea {
+    padding: 18px;
+}
+
+.btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+    border: none;
+    background-color: var(--color-blue);
+    width: 82px;
+    height: 32px;
+    font-size: 16px;
+    font-weight: 500;
+    line-height: 21.79px;
+    color: var(--color-white);
+}
