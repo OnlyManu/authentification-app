@@ -1,12 +1,23 @@
-import {useState} from "react";
 import Link from "next/link";
 import styles from "./menu.module.css";
 
+import {useState} from "react";
+import {useRouter} from "next/router";
+import {logoutUser} from "../../lib/auth";
+
 export default function Menu() {
+  const router = useRouter();
   const [isOpen, setIsOpen] = useState<boolean>();
 
   const openCloseMenu = () => {
     setIsOpen(!isOpen);
+  };
+
+  const logout = async () => {
+    const result = await logoutUser();
+    if (result) {
+      router.push("/login");
+    }
   };
 
   return (
@@ -44,7 +55,7 @@ export default function Menu() {
           </div>
         </div>
         <div className={styles.separator}></div>
-        <div className={styles.logout}>
+        <div className={styles.logout} onClick={logout}>
           <svg
             className={styles.logoutIcon}
             xmlns="http://www.w3.org/2000/svg"
