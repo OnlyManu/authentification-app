@@ -5,11 +5,16 @@
 }
 
 .profile {
+    display: flex;
+    align-items: center;
+    justify-content: center;
     width: 32px;
-    height: 32px;
+    height: fit-content;
+    max-height: 32px;
     border-radius: 8px;
     background-color: var(--color-gray-3);
     cursor: pointer;
+    overflow: hidden;
 }
 
 .contextual {

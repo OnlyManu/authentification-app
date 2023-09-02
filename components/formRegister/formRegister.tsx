@@ -56,8 +56,6 @@ export default function FormRegister() {
       const result = await registerUserWithEmail(email, password);
       if (result) {
         redirectToProfile();
-      } else {
-        alert("Something went wrong");
       }
     }
   };

@@ -1,7 +1,12 @@
 import {GetServerSideProps, InferGetServerSidePropsType} from "next";
 import {useEffect, useState} from "react";
 import {NextRouter, useRouter} from "next/router";
-import {isValidateUser, getUserUID} from "../../lib/auth";
+import {
+  userData,
+  isValidateUser,
+  getUserUID,
+  getUserData,
+} from "../../lib/auth";
 import Head from "next/head";
 import styles from "../../styles/EditProfile.module.css";
 
@@ -11,11 +16,16 @@ import FormInfos from "../../components/formInfos/formInfos";
 
 export default function EditProfile() {
   const router: NextRouter = useRouter();
-  const [user, setUser] = useState<null | string>(null);
+  const [user, setUser] = useState<null | userData>(null);
 
   useEffect(() => {
+    async function setUserData() {
+      const userData: userData = await getUserData();
+      setUser(userData);
+    }
+
     if (isValidateUser()) {
-      setUser(getUserUID);
+      setUserData();
     } else {
       router.replace("/login");
     }
@@ -35,12 +45,12 @@ export default function EditProfile() {
 
         <header className={styles.header}>
           <Navbar>
-            <Menu />
+            <Menu userPhotoUrl={user.photo} />
           </Navbar>
         </header>
 
         <main className={styles.main}>
-          <FormInfos />
+          <FormInfos userInfos={user} />
         </main>
       </div>
     );

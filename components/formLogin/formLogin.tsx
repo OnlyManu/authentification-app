@@ -56,8 +56,6 @@ export default function FormLogin() {
       const result = await loginUserWithEmail(email, password);
       if (result) {
         redirectToProfile();
-      } else {
-        alert("Something went wrong");
       }
     }
   };

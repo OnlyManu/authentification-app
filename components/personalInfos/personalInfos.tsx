@@ -1,8 +1,16 @@
 import Link from "next/link";
+import Image from "next/image";
 import styles from "./personalInfos.module.css";
 import utils from "../../styles/utils.module.css";
 
-export default function PersonalInfos() {
+import {userData} from "../../lib/auth";
+
+interface IProps {
+  userInfos: userData;
+}
+
+export default function PersonalInfos({userInfos}: IProps) {
+  console.log(userInfos.photo);
   return (
     <div className={styles.container}>
       <div className={styles.header}>
@@ -26,25 +34,33 @@ export default function PersonalInfos() {
         <div className={styles.infos}>
           <div className={styles.info}>
             <span className={styles.label}>PHOTO</span>
-            <div className={styles.profile}></div>
+            <div className={styles.profile}>
+              {userInfos.photo !== "" ? (
+                <img
+                  src={userInfos.photo}
+                  style={{width: "72px", height: "auto"}}
+                  alt=""
+                />
+              ) : (
+                <></>
+              )}
+            </div>
           </div>
           <div className={styles.info}>
             <span className={styles.label}>NAME</span>
-            <span className={styles.value}>Xanthe Neal</span>
+            <span className={styles.value}>{userInfos.name}</span>
           </div>
           <div className={styles.info}>
             <span className={styles.label}>BIO</span>
-            <span className={styles.value}>
-              I am a software developer and a big fan of devchallenges...
-            </span>
+            <span className={styles.value}>{userInfos.bio}</span>
           </div>
           <div className={styles.info}>
             <span className={styles.label}>PHONE</span>
-            <span className={styles.value}>908249274292</span>
+            <span className={styles.value}>{userInfos.phone}</span>
           </div>
           <div className={styles.info}>
             <span className={styles.label}>EMAIL</span>
-            <span className={styles.value}>xanthe.neal@gmail.com</span>
+            <span className={styles.value}>{userInfos.email}</span>
           </div>
           <div className={styles.info}>
             <span className={styles.label}>PASSWORD</span>

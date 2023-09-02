@@ -15,7 +15,17 @@ import {
   setDoc,
   deleteDoc,
   collection,
+  getDoc,
 } from "firebase/firestore";
+
+export interface userData {
+  photo: string;
+  name: string;
+  bio: string;
+  phone: string;
+  email: string;
+  password: string;
+}
 
 const firebaseConfig = {
   apiKey: "AIzaSyAmjkvBUN5RZytYdF031ZKko4uT3ogQ7LQ",
@@ -53,6 +63,25 @@ export const getUserUID = (): null | string => {
   return null;
 };
 
+const showErrorForLoginAndRegisterWithEmail = (error: any) => {
+  if (error.code == "auth/email-already-in-use") {
+    alert("The email address is already in use");
+  } else if (error.code == "auth/invalid-email") {
+    alert("The email address is not valid.");
+  } else if (error.code == "auth/operation-not-allowed") {
+    alert("Operation not allowed.");
+  } else if (error.code == "auth/weak-password") {
+    alert("The password is too weak.");
+  } else if (error.code == "auth/user-not-found") {
+    alert("User not found.");
+  } else if (error.code == "auth/wrong-password") {
+    alert("Your password is incorrect.");
+  } else {
+    alert("Something went wrong.");
+    console.log(error);
+  }
+};
+
 export const loginUserWithEmail = async (
   email: string,
   password: string
@@ -62,7 +91,7 @@ export const loginUserWithEmail = async (
       return true;
     })
     .catch((error) => {
-      console.log(error);
+      showErrorForLoginAndRegisterWithEmail(error);
       return false;
     });
 
@@ -133,7 +162,7 @@ export const registerUserWithEmail = async (
       return true;
     })
     .catch((error) => {
-      console.log(error);
+      showErrorForLoginAndRegisterWithEmail(error);
       return false;
     });
 
@@ -144,7 +173,9 @@ export const registerUserWithGoogle = async (): Promise<boolean> => {
   const result = await signInWithPopup(auth, googleProvider)
     .then(async (userCredentials) => {
       const user = userCredentials.user;
-      await createUserBio(user.uid);
+      if (!(await isUserBio(user.uid))) {
+        await createUserBio(user.uid);
+      }
       return true;
     })
     .catch((error) => {
@@ -158,7 +189,9 @@ export const registerUserWithFacebook = async (): Promise<boolean> => {
   const result = await signInWithPopup(auth, facebookProvider)
     .then(async (userCredentials) => {
       const user = userCredentials.user;
-      await createUserBio(user.uid);
+      if (!(await isUserBio(user.uid))) {
+        await createUserBio(user.uid);
+      }
       return true;
     })
     .catch((error) => {
@@ -172,7 +205,9 @@ export const registerUserWithGithub = async (): Promise<boolean> => {
   const result = await signInWithPopup(auth, githubProvider)
     .then(async (userCredentials) => {
       const user = userCredentials.user;
-      await createUserBio(user.uid);
+      if (!(await isUserBio(user.uid))) {
+        await createUserBio(user.uid);
+      }
       return true;
     })
     .catch((error) => {
@@ -190,4 +225,40 @@ export const createUserBio = async (id: string) => {
   } catch (error) {
     console.log(error);
   }
+};
+
+export const getUserBio = async (id: string): Promise<string> => {
+  try {
+    if (!(await isUserBio(id))) {
+      await createUserBio(id);
+    }
+
+    const docSnap = await getDoc(doc(db, "userBio", id));
+    return docSnap.data()?.bio as string;
+  } catch (error) {
+    console.log(error);
+    return "";
+  }
+};
+
+const isUserBio = async (id: string): Promise<boolean> => {
+  const docSnap = await getDoc(doc(db, "userBio", id));
+  if (docSnap.exists()) {
+    return true;
+  }
+  return false;
+};
+
+export const getUserData = async (): Promise<userData> => {
+  const user = auth.currentUser;
+  const userData = {
+    photo: user?.photoURL ? user.photoURL : "",
+    name: user?.displayName ? user.displayName : "",
+    bio: await getUserBio(user?.uid as string),
+    phone: user?.phoneNumber ? user.phoneNumber : "",
+    email: user?.email ? user.email : "",
+    password: "**************",
+  };
+
+  return userData;
 };

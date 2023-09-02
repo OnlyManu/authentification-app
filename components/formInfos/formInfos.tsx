@@ -1,8 +1,18 @@
 import styles from "./formInfos.module.css";
 import utils from "../../styles/utils.module.css";
 import Link from "next/link";
+import Image from "next/image";
 
-export default function FormInfos() {
+import React, {useState} from "react";
+import {userData} from "../../lib/auth";
+
+interface IProps {
+  userInfos: userData;
+}
+
+export default function FormInfos({userInfos}: IProps) {
+  const [user, setUser] = useState<userData>(userInfos);
+
   return (
     <div className={styles.container}>
       <Link className={styles.link} href="/profile">
@@ -27,6 +37,15 @@ export default function FormInfos() {
         <form className={styles.formEdit}>
           <div className={styles.profileGroup}>
             <div className={styles.profile}>
+              {user.photo !== "" ? (
+                <img
+                  src={userInfos.photo}
+                  style={{width: "72px", height: "auto"}}
+                  alt=""
+                />
+              ) : (
+                <></>
+              )}
               <input id="profile" type="file" hidden />
               <div className={styles.profileOver}>
                 <svg
@@ -53,6 +72,7 @@ export default function FormInfos() {
                 className={styles.ipt}
                 id="name"
                 type="text"
+                value={user.name}
                 placeholder="Enter your name..."
               />
             </div>
@@ -64,6 +84,7 @@ export default function FormInfos() {
                 className={styles.textarea}
                 id="bio"
                 placeholder="Enter your bio..."
+                value={user.bio}
                 rows={3}
               ></textarea>
             </div>
@@ -75,6 +96,7 @@ export default function FormInfos() {
                 className={styles.ipt}
                 id="phone"
                 type="tel"
+                value={user.phone}
                 placeholder="Enter your phone..."
               />
             </div>
@@ -86,6 +108,7 @@ export default function FormInfos() {
                 className={styles.ipt}
                 id="email"
                 type="email"
+                value={user.email}
                 placeholder="Enter your email..."
               />
             </div>

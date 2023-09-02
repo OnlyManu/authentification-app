@@ -1,11 +1,16 @@
 import Link from "next/link";
+import Image from "next/image";
 import styles from "./menu.module.css";
 
 import {useState} from "react";
 import {useRouter} from "next/router";
 import {logoutUser} from "../../lib/auth";
 
-export default function Menu() {
+interface IProps {
+  userPhotoUrl: string;
+}
+
+export default function Menu({userPhotoUrl}: IProps) {
   const router = useRouter();
   const [isOpen, setIsOpen] = useState<boolean>();
 
@@ -16,13 +21,23 @@ export default function Menu() {
   const logout = async () => {
     const result = await logoutUser();
     if (result) {
-      router.push("/login");
+      router.replace("/login");
     }
   };
 
   return (
     <div className={styles.container}>
-      <div className={styles.profile} onClick={openCloseMenu}></div>
+      <div className={styles.profile} onClick={openCloseMenu}>
+        {userPhotoUrl !== "" ? (
+          <img
+            src={userPhotoUrl}
+            style={{width: "32px", height: "auto"}}
+            alt=""
+          />
+        ) : (
+          <></>
+        )}
+      </div>
       <nav
         className={
           isOpen ? styles.contextual + " " + styles.open : styles.contextual
