@@ -4,19 +4,23 @@ import Link from "next/link";
 
 import React, {useState} from "react";
 import {useRouter} from "next/router";
+import {useDispatch} from "react-redux";
+import {setIsPasswordAction} from "../../lib/store";
 import {
   registerUserWithEmail,
-  registerUserWithGoogle,
-  registerUserWithFacebook,
-  registerUserWithGithub,
+  loginUserWithGoogle,
+  loginUserWithFacebook,
+  loginUserWithGithub,
 } from "../../lib/auth";
 
 export default function FormRegister() {
-  const router = useRouter();
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
+  const dispatch = useDispatch();
+  const router = useRouter();
 
-  const redirectToProfile = () => {
+  const redirectToProfile = (isPassword: boolean) => {
+    dispatch(setIsPasswordAction(isPassword));
     router.replace("/profile");
   };
 
@@ -55,29 +59,41 @@ export default function FormRegister() {
     if (isFormValid()) {
       const result = await registerUserWithEmail(email, password);
       if (result) {
-        redirectToProfile();
+        redirectToProfile(true);
       }
     }
   };
 
   const registerWithGoogle = async () => {
-    const result = await registerUserWithGoogle();
-    if (result) {
-      redirectToProfile();
+    try {
+      const result = await loginUserWithGoogle();
+      if (result) {
+        redirectToProfile(false);
+      }
+    } catch (error) {
+      console.log(error);
     }
   };
 
   const registerWithFacebook = async () => {
-    const result = await registerUserWithFacebook();
-    if (result) {
-      redirectToProfile();
+    try {
+      const result = await loginUserWithFacebook();
+      if (result) {
+        redirectToProfile(false);
+      }
+    } catch (error) {
+      console.log(error);
     }
   };
 
   const registerWithGithub = async () => {
-    const result = await registerUserWithGithub();
-    if (result) {
-      redirectToProfile();
+    try {
+      const result = await loginUserWithGithub();
+      if (result) {
+        redirectToProfile(false);
+      }
+    } catch (error) {
+      console.log(error);
     }
   };
 

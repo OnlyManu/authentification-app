@@ -5,26 +5,29 @@ import {
   signInWithEmailAndPassword,
   signInWithPopup,
   signOut,
+  updateProfile,
+  updatePassword,
+  updateEmail,
   GoogleAuthProvider,
   FacebookAuthProvider,
   GithubAuthProvider,
 } from "firebase/auth";
-import {
-  getFirestore,
-  doc,
-  setDoc,
-  deleteDoc,
-  collection,
-  getDoc,
-} from "firebase/firestore";
+import {getFirestore, doc, setDoc, updateDoc, getDoc} from "firebase/firestore";
+import {getStorage, uploadBytes, ref, getDownloadURL} from "firebase/storage";
 
 export interface userData {
+  uid: string;
   photo: string;
   name: string;
   bio: string;
   phone: string;
   email: string;
   password: string;
+}
+
+interface userBioAndPhone {
+  bio: string;
+  phone: string;
 }
 
 const firebaseConfig = {
@@ -39,6 +42,10 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 
 const db = getFirestore(app);
+
+const storage = getStorage();
+
+const userProfileRef = ref(storage, "userProfile");
 
 const auth = getAuth();
 const googleProvider = new GoogleAuthProvider();
@@ -102,6 +109,12 @@ export const loginUserWithGoogle = async (): Promise<boolean> => {
   const result = await signInWithPopup(auth, googleProvider)
     .then(async (userCredentials) => {
       const user = userCredentials.user;
+      if (!(await isUserBioAndPhone(user.uid))) {
+        await createUserBioAndPhone(
+          user.uid,
+          user.phoneNumber ? user.phoneNumber : ""
+        );
+      }
       return true;
     })
     .catch((error) => {
@@ -115,6 +128,12 @@ export const loginUserWithFacebook = async (): Promise<boolean> => {
   const result = await signInWithPopup(auth, facebookProvider)
     .then(async (userCredentials) => {
       const user = userCredentials.user;
+      if (!(await isUserBioAndPhone(user.uid))) {
+        await createUserBioAndPhone(
+          user.uid,
+          user.phoneNumber ? user.phoneNumber : ""
+        );
+      }
       return true;
     })
     .catch((error) => {
@@ -128,6 +147,12 @@ export const loginUserWithGithub = async (): Promise<boolean> => {
   const result = await signInWithPopup(auth, githubProvider)
     .then(async (userCredentials) => {
       const user = userCredentials.user;
+      if (!(await isUserBioAndPhone(user.uid))) {
+        await createUserBioAndPhone(
+          user.uid,
+          user.phoneNumber ? user.phoneNumber : ""
+        );
+      }
       return true;
     })
     .catch((error) => {
@@ -157,8 +182,11 @@ export const registerUserWithEmail = async (
   const result = await createUserWithEmailAndPassword(auth, email, password)
     .then(async (userCredentials) => {
       const user = userCredentials.user;
-      await createUserBio(user.uid);
-
+      await createUserBioAndPhone(
+        user.uid,
+        user.phoneNumber ? user.phoneNumber : ""
+      );
+      await modifyUserName("User");
       return true;
     })
     .catch((error) => {
@@ -169,96 +197,133 @@ export const registerUserWithEmail = async (
   return result;
 };
 
-export const registerUserWithGoogle = async (): Promise<boolean> => {
-  const result = await signInWithPopup(auth, googleProvider)
-    .then(async (userCredentials) => {
-      const user = userCredentials.user;
-      if (!(await isUserBio(user.uid))) {
-        await createUserBio(user.uid);
-      }
-      return true;
-    })
-    .catch((error) => {
-      console.log(error);
-      return false;
-    });
-  return result;
-};
-
-export const registerUserWithFacebook = async (): Promise<boolean> => {
-  const result = await signInWithPopup(auth, facebookProvider)
-    .then(async (userCredentials) => {
-      const user = userCredentials.user;
-      if (!(await isUserBio(user.uid))) {
-        await createUserBio(user.uid);
-      }
-      return true;
-    })
-    .catch((error) => {
-      console.log(error);
-      return false;
-    });
-  return result;
-};
-
-export const registerUserWithGithub = async (): Promise<boolean> => {
-  const result = await signInWithPopup(auth, githubProvider)
-    .then(async (userCredentials) => {
-      const user = userCredentials.user;
-      if (!(await isUserBio(user.uid))) {
-        await createUserBio(user.uid);
-      }
-      return true;
-    })
-    .catch((error) => {
-      console.log(error);
-      return false;
-    });
-  return result;
-};
-
-export const createUserBio = async (id: string) => {
+export const createUserBioAndPhone = async (id: string, phone: string) => {
   try {
-    const docRef = await setDoc(doc(db, "usersBio", id), {
-      bio: "",
+    const docRef = await setDoc(doc(db, "userBioAndPhone", id), {
+      bio: "I am a user",
+      phone,
     });
   } catch (error) {
     console.log(error);
   }
 };
 
-export const getUserBio = async (id: string): Promise<string> => {
+export const getUserBioAndPhone = async (
+  id: string
+): Promise<userBioAndPhone> => {
   try {
-    if (!(await isUserBio(id))) {
-      await createUserBio(id);
+    if (!(await isUserBioAndPhone(id))) {
+      const user = auth.currentUser;
+      if (user) {
+        await createUserBioAndPhone(
+          id,
+          user.phoneNumber ? user.phoneNumber : ""
+        );
+      }
     }
 
-    const docSnap = await getDoc(doc(db, "userBio", id));
-    return docSnap.data()?.bio as string;
+    const docSnap = await getDoc(doc(db, "userBioAndPhone", id));
+    const userBioAndPhone: userBioAndPhone = {
+      bio: docSnap.data()?.bio,
+      phone: docSnap.data()?.phone,
+    };
+    return userBioAndPhone;
   } catch (error) {
     console.log(error);
-    return "";
+    return {
+      bio: "",
+      phone: "",
+    };
   }
 };
 
-const isUserBio = async (id: string): Promise<boolean> => {
-  const docSnap = await getDoc(doc(db, "userBio", id));
+export const modifyUserBioAndPhone = async (bio: string, phone: string) => {
+  const user = auth.currentUser;
+  if (user) {
+    await updateDoc(doc(db, "userBioAndPhone", user.uid), {
+      bio,
+      phone,
+    });
+  }
+};
+
+const isUserBioAndPhone = async (id: string): Promise<boolean> => {
+  const docSnap = await getDoc(doc(db, "userBioAndPhone", id));
   if (docSnap.exists()) {
     return true;
   }
   return false;
 };
 
-export const getUserData = async (): Promise<userData> => {
+export const modifyUserPhoto = async (photoUrl: string) => {
   const user = auth.currentUser;
-  const userData = {
-    photo: user?.photoURL ? user.photoURL : "",
-    name: user?.displayName ? user.displayName : "",
-    bio: await getUserBio(user?.uid as string),
-    phone: user?.phoneNumber ? user.phoneNumber : "",
-    email: user?.email ? user.email : "",
-    password: "**************",
-  };
+  if (user) {
+    await updateProfile(user, {
+      photoURL: photoUrl,
+    });
+  }
+};
 
-  return userData;
+export const modifyUserName = async (name: string) => {
+  const user = auth.currentUser;
+  if (user) {
+    await updateProfile(user, {
+      displayName: name,
+    });
+  }
+};
+
+export const modifyUserEmail = async (email: string) => {
+  const user = auth.currentUser;
+  if (user) {
+    await updateEmail(user, email);
+  }
+};
+
+export const modifyUserPassword = async (password: string) => {
+  const user = auth.currentUser;
+  if (user) {
+    await updatePassword(user, password);
+  }
+};
+
+export const uploadUserPhoto = async (photo: File): Promise<string | null> => {
+  const user = auth.currentUser;
+  if (user) {
+    const userRef = ref(userProfileRef, user.uid);
+    const profileRef = ref(userRef, Date.now().toString());
+    const resultRef = await uploadBytes(userRef, photo).then(
+      (snapshot) => snapshot.ref
+    );
+    const url = await getDownloadURL(resultRef).then(
+      (downloadURL) => downloadURL
+    );
+
+    return url;
+  }
+
+  return null;
+};
+
+export const getUserData = async (): Promise<null | userData> => {
+  try {
+    const user = auth.currentUser;
+    const userBioAndPhone: userBioAndPhone = await getUserBioAndPhone(
+      user?.uid as string
+    );
+    const userData = {
+      uid: user?.uid ? user.uid : "",
+      photo: user?.photoURL ? user.photoURL : "",
+      name: user?.displayName ? user.displayName : "",
+      bio: userBioAndPhone.bio,
+      phone: userBioAndPhone.phone,
+      email: user?.email ? user.email : "",
+      password: "",
+    };
+
+    return userData;
+  } catch (error) {
+    console.log(error);
+    return null;
+  }
 };

@@ -3,6 +3,7 @@ import Image from "next/image";
 import styles from "./personalInfos.module.css";
 import utils from "../../styles/utils.module.css";
 
+import {useSelector} from "react-redux";
 import {userData} from "../../lib/auth";
 
 interface IProps {
@@ -10,7 +11,8 @@ interface IProps {
 }
 
 export default function PersonalInfos({userInfos}: IProps) {
-  console.log(userInfos.photo);
+  const isPassword = useSelector((state: any) => state.isPassword as boolean);
+
   return (
     <div className={styles.container}>
       <div className={styles.header}>
@@ -38,7 +40,7 @@ export default function PersonalInfos({userInfos}: IProps) {
               {userInfos.photo !== "" ? (
                 <img
                   src={userInfos.photo}
-                  style={{width: "72px", height: "auto"}}
+                  style={{width: "auto", height: "72px"}}
                   alt=""
                 />
               ) : (
@@ -62,10 +64,12 @@ export default function PersonalInfos({userInfos}: IProps) {
             <span className={styles.label}>EMAIL</span>
             <span className={styles.value}>{userInfos.email}</span>
           </div>
-          <div className={styles.info}>
-            <span className={styles.label}>PASSWORD</span>
-            <span className={styles.value}>************</span>
-          </div>
+          {isPassword && (
+            <div className={styles.info}>
+              <span className={styles.label}>PASSWORD</span>
+              <span className={styles.value}>************</span>
+            </div>
+          )}
         </div>
       </div>
     </div>

@@ -9,12 +9,15 @@
     align-items: center;
     justify-content: center;
     width: 32px;
-    height: fit-content;
-    max-height: 32px;
+    height: 32px;
     border-radius: 8px;
     background-color: var(--color-gray-3);
     cursor: pointer;
     overflow: hidden;
+}
+
+.user {
+    display: none;
 }
 
 .contextual {
@@ -77,4 +80,34 @@
     height: 1px;
     background-color: var(--color-gray-3);
     margin: 10px 0;
+}
+
+@media screen and (min-width: 768px) {
+    .container {
+        flex-direction: row;
+        gap: 11px;
+        align-items: center;
+    }
+    .user {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        gap: 19px;
+        cursor: pointer;
+    }
+    .user .name {
+        font-size: 12px;
+        font-weight: 700;
+        line-height: 16.34px;
+        max-width: 200px;
+        text-overflow: ellipsis;
+        color: var(--color-black-2);
+    }
+    .user .icon {
+        width: 24px;
+        height: 24px;
+    }
+    .user .icon path {
+        fill: var(--color-black-2);
+    }    
 }

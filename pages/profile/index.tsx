@@ -1,6 +1,7 @@
-import {GetServerSideProps, InferGetServerSidePropsType} from "next";
-import {useEffect, useState} from "react";
+import {useEffect} from "react";
 import {NextRouter, useRouter} from "next/router";
+import {useDispatch, useSelector} from "react-redux";
+import {userType, updateUserAction, setIsUerAction} from "../../lib/store";
 import {userData, isValidateUser, getUserData} from "../../lib/auth";
 import Head from "next/head";
 import styles from "../../styles/Profile.module.css";
@@ -11,22 +12,25 @@ import PersonalInfos from "../../components/personalInfos/personalInfos";
 
 export default function Profile() {
   const router: NextRouter = useRouter();
-  const [user, setUser] = useState<null | userData>(null);
+  const isUser: boolean = useSelector((state: any) => state.isUser as boolean);
+  const user: userType = useSelector((state: any) => state.user as userType);
+  const dispatch = useDispatch();
 
   useEffect(() => {
     async function setUserData() {
-      const userData: userData = await getUserData();
-      setUser(userData);
+      const userData: userType = await getUserData();
+      dispatch(updateUserAction(userData));
     }
 
     if (isValidateUser()) {
+      dispatch(setIsUerAction(true));
       setUserData();
     } else {
       router.replace("/login");
     }
-  }, []);
+  }, [isUser]);
 
-  if (user) {
+  if (isUser && user) {
     return (
       <div className={styles.container}>
         <Head>
@@ -40,7 +44,7 @@ export default function Profile() {
 
         <header className={styles.header}>
           <Navbar>
-            <Menu userPhotoUrl={user.photo} />
+            <Menu userPhotoUrl={user?.photo as string} />
           </Navbar>
         </header>
 

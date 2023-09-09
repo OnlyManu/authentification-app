@@ -4,6 +4,8 @@ import Link from "next/link";
 
 import React, {useState} from "react";
 import {useRouter} from "next/router";
+import {useDispatch} from "react-redux";
+import {setIsPasswordAction} from "../../lib/store";
 import {
   loginUserWithEmail,
   loginUserWithGoogle,
@@ -12,11 +14,13 @@ import {
 } from "../../lib/auth";
 
 export default function FormLogin() {
-  const router = useRouter();
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
+  const router = useRouter();
+  const dispatch = useDispatch();
 
-  const redirectToProfile = () => {
+  const redirectToProfile = (isPassword: boolean) => {
+    dispatch(setIsPasswordAction(isPassword));
     router.replace("/profile");
   };
 
@@ -55,29 +59,41 @@ export default function FormLogin() {
     if (isFormValid()) {
       const result = await loginUserWithEmail(email, password);
       if (result) {
-        redirectToProfile();
+        redirectToProfile(true);
       }
     }
   };
 
   const loginWithGoogle = async () => {
-    const result = await loginUserWithGoogle();
-    if (result) {
-      redirectToProfile();
+    try {
+      const result = await loginUserWithGoogle();
+      if (result) {
+        redirectToProfile(false);
+      }
+    } catch (error) {
+      console.log(error);
     }
   };
 
   const loginWithFacebook = async () => {
-    const result = await loginUserWithFacebook();
-    if (result) {
-      redirectToProfile();
+    try {
+      const result = await loginUserWithFacebook();
+      if (result) {
+        redirectToProfile(false);
+      }
+    } catch (error) {
+      console.log(error);
     }
   };
 
   const loginWithGithub = async () => {
-    const result = await loginUserWithGithub();
-    if (result) {
-      redirectToProfile();
+    try {
+      const result = await loginUserWithGithub();
+      if (result) {
+        redirectToProfile(false);
+      }
+    } catch (error) {
+      console.log(error);
     }
   };
 

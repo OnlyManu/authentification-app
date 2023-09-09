@@ -17,10 +17,12 @@
     color: var(--color-blue-2);
     cursor: pointer;
 }
+
 .linkIcon {
     width: 18px;
     height: 18px;
 }
+
 .linkIcon path {
     fill: var(--color-blue-2);
 }
@@ -48,8 +50,7 @@
     justify-content: center;
     align-items: center;
     width: 72px;
-    height: fit-content;
-    max-height: 72px;
+    height: 72px;
     border-radius: 8px;
     background-color: var(--color-gray-3);
     overflow: hidden;
@@ -66,12 +67,16 @@
     height: 100%;
     background-color: rgba(0, 0, 0, 0.2);
 }
+
 .profileIcon {
     z-index: 3;
+    cursor: pointer;
 }
+
 .profileIcon path, .profileIcon circle {
     fill: var(--color-white);
 }
+
 .profileLabel {
     font-size: 13px;
     font-weight: 500;
@@ -123,6 +128,7 @@
 }
 
 .btn {
+    position: relative;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -135,4 +141,45 @@
     font-weight: 500;
     line-height: 21.79px;
     color: var(--color-white);
+}
+.btn:hover::after{
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    border-radius: 8px;
+    background-color: rgba(255, 255, 255, 0.4);
+}
+
+@media screen and (min-width: 768px) {
+    .container {
+        padding: 0px 6vw;       
+    }
+    .formEditWrapper {
+        width: 100%;
+        padding: 30px 49px;
+        border: 1px solid var(--color-gray-3);
+        border-radius: 12px;
+        margin-bottom: 44px;
+    }
+    .formEdit {
+        margin-bottom: 22px;
+    }
+    .iptGroup {
+        width: 416px;
+    }
+}
+
+@media screen and (min-width: 1024px) {
+    .container {
+        padding: 0px 15vw;
+    }
+}
+
+@media screen and (min-width: 1280px) {
+    .container {
+        padding: 0 225px;        
+    }
 }
